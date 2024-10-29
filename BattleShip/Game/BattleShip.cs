@@ -185,21 +185,37 @@ public static class BattleShip
         for (int i = 0; i < shipLength; i++) 
             coords[i] = new Coords(split[i]);
 
-        var areEq1 = true;
-        var areEq2 = true;
-
-        //var a = (shipLength == 1) ? 0 : (coords[0].X <= coords[1].X ? 1 : -1);
-        //var b = (shipLength == 1) ? 0 : (coords[0].Y <= coords[1].Y ? 1 : -1);
+        var isVertical = true;
+        var isHorizontal = true;
 
         for (int i = 1; i < shipLength; i++)
-            if ( coords[i].X != coords[i-1].X /*&& coords[i-1].Y - coords[i].Y != b*/ )
-                areEq1 = false;
-        for (int i = 1; i < shipLength; i++)
-            if ( coords[i].Y != coords[i-1].Y /*&& coords[i-1].X - coords[i].X != a*/ )
-                areEq2 = false;
+        {
+            if ( coords[i].X != coords[i-1].X ) isVertical = false;
+            if ( coords[i].Y != coords[i-1].Y ) isHorizontal = false;
+        }
 
-        if ( !areEq1 && !areEq2 )
+        if ( !isVertical && !isHorizontal )
             throw new Exception("Кораблики не могут ходить по диагонали!");
+
+        if ( shipLength > 1 )
+        {
+            if ( isHorizontal )
+            {
+                var a = ( coords[0].X < coords[1].X ) ? 1 : -1;
+
+                for (int i = 1; i < shipLength; i++)
+                    if ( coords[i].X - coords[i-1].X != a )
+                        throw new Exception("Кораблики должны быть непрерывны!");
+            }
+            else
+            {
+                var a = (coords[0].Y < coords[1].Y) ? 1 : -1;
+
+                for (int i = 1; i < shipLength; i++)
+                    if ( coords[i].Y - coords[i-1].Y != a )
+                        throw new Exception("Кораблики должны быть непрерывны!");
+            }
+        }
 
         return coords;
     }
