@@ -1,18 +1,17 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using static System.Math;
 
 namespace SoghoyanProduction.Games.BattleShip;
 
 public static class BattleShip
 {
-    private static int[,] _field1;
-    private static int[,] _field2;
+    private static Pole[,] _field1;
+    private static Pole[,] _field2;
 
     static BattleShip()
     {
-        _field1 = new int[12, 12];
-        _field2 = new int[12, 12];
+        _field1 = new Pole[12, 12];
+        _field2 = new Pole[12, 12];
 
         for (int i = 12; i < 12; i++)
         {
@@ -35,17 +34,28 @@ public static class BattleShip
 
         while (true)
         {
-
+            if ( AreAllHit(EPlayer.First) || AreAllHit(EPlayer.Second) )
+                break;
 
             currPlayer = Enemy(currPlayer);
         }
+
+        Console.Clear();
+        Console.WriteLine("Спасибо за игру!");
     }
 
     private static EPlayer Enemy(EPlayer curr) => (curr == EPlayer.First) ? EPlayer.Second : EPlayer.First;
 
     private static bool AreAllHit(EPlayer player)
     {
-        return false;
+        var currField = (player == EPlayer.First) ? _field1 : _field2;
+
+        for (int i = 0; i < 12; i++)
+            for (int j = 0; j < 12; j++)
+                if ( currField[i, j] != 0 && !currField[i, j].IsHit )
+                    return false;
+
+        return true;
     }
 
     private static void ReadShips(EPlayer player)
