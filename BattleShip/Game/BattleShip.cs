@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using static System.Math;
 
 namespace SoghoyanProduction.Games.BattleShip;
 
@@ -15,9 +14,9 @@ public static class BattleShip
         _field1 = new Pole[12, 12];
         _field2 = new Pole[12, 12];
 
-        for (int i = 12; i < 12; i++)
+        for (Int32 i = 12; i < 12; i++)
         {
-            for (int j = 12; j < 12; j++)
+            for (Int32 j = 12; j < 12; j++)
             {
                 _field1[i, j] = 0;
                 _field2[i, j] = 0;
@@ -119,12 +118,12 @@ public static class BattleShip
 
     private static EPlayer Enemy(EPlayer curr) => (curr == EPlayer.First) ? EPlayer.Second : EPlayer.First;
 
-    private static bool AreAllHit(EPlayer player)
+    private static Boolean AreAllHit(EPlayer player)
     {
         var currField = (player == EPlayer.First) ? _field1 : _field2;
 
-        for (int i = 0; i < 12; i++)
-            for (int j = 0; j < 12; j++)
+        for (Int32 i = 0; i < 12; i++)
+            for (Int32 j = 0; j < 12; j++)
                 if ( currField[i, j] != 0 && !currField[i, j].IsHit )
                     return false;
 
@@ -133,25 +132,25 @@ public static class BattleShip
 
     private static void ReadShips(EPlayer player)
     {
-        for (int shipLength = 1; shipLength <= 4; shipLength++)
+        for (Int32 shipLength = 1; shipLength <= 4; shipLength++)
         {
-            int shipsCount = 5 - shipLength;
+            Int32 shipsCount = 5 - shipLength;
 
-            for (int j = 0; j < shipsCount; j++)
+            for (Int32 j = 0; j < shipsCount; j++)
             {
                 try 
                 {
                     Print(player);
-                    _lastException = string.Empty;
+                    _lastException = String.Empty;
                     var coords = ReadPoles(shipLength);
 
                     var currField = (player == EPlayer.First) ? _field1 : _field2;
 
                     foreach (var coord in coords)
                     {
-                        for (int ii = -1; ii <= 1; ii++)
+                        for (Int32 ii = -1; ii <= 1; ii++)
                         {
-                            for (int jj = -1; jj <= 1; jj++)
+                            for (Int32 jj = -1; jj <= 1; jj++)
                             {
                                 if (currField[coord.X + ii, coord.Y + jj] != 0)
                                     throw new Exception("Не там поставлен кораблик!");
@@ -176,7 +175,7 @@ public static class BattleShip
         }
     }
 
-    private static Coords[] ReadPoles(int shipLength)
+    private static Coords[] ReadPoles(Int32 shipLength)
     {
         Console.Write("Введите корабль длины {0}: ", shipLength);
         var s = Console.ReadLine();
@@ -190,13 +189,13 @@ public static class BattleShip
             throw new Exception("Введен неправильный кораблик!");
 
         var coords = new Coords[shipLength];
-        for (int i = 0; i < shipLength; i++) 
+        for (Int32 i = 0; i < shipLength; i++) 
             coords[i] = new Coords(split[i]);
 
         var isVertical = true;
         var isHorizontal = true;
 
-        for (int i = 1; i < shipLength; i++)
+        for (Int32 i = 1; i < shipLength; i++)
         {
             if ( coords[i].X != coords[i-1].X ) isVertical = false;
             if ( coords[i].Y != coords[i-1].Y ) isHorizontal = false;
@@ -211,7 +210,7 @@ public static class BattleShip
             {
                 var a = ( coords[0].X < coords[1].X ) ? 1 : -1;
 
-                for (int i = 1; i < shipLength; i++)
+                for (Int32 i = 1; i < shipLength; i++)
                     if ( coords[i].X - coords[i-1].X != a )
                         throw new Exception("Кораблики должны быть непрерывны!");
             }
@@ -219,7 +218,7 @@ public static class BattleShip
             {
                 var a = (coords[0].Y < coords[1].Y) ? 1 : -1;
 
-                for (int i = 1; i < shipLength; i++)
+                for (Int32 i = 1; i < shipLength; i++)
                     if ( coords[i].Y - coords[i-1].Y != a )
                         throw new Exception("Кораблики должны быть непрерывны!");
             }
@@ -256,10 +255,10 @@ public static class BattleShip
         Console.WriteLine("  1 2 3 4 5 6 7 8 9 10");
         var s = "abcdefghij";
 
-        for (int i = 1; i <= 10; ++i)
+        for (Int32 i = 1; i <= 10; ++i)
         {
             Console.Write(s[i-1] + " ");
-            for (int j = 1; j <= 10; ++j)
+            for (Int32 j = 1; j <= 10; ++j)
             {
                 if (currField[i, j] != 0)
                 {
@@ -283,10 +282,10 @@ public static class BattleShip
         Console.WriteLine("  1 2 3 4 5 6 7 8 9 10");
         var s = "abcdefghij";
 
-        for (int i = 1; i <= 10; ++i)
+        for (Int32 i = 1; i <= 10; ++i)
         {
             Console.Write(s[i - 1] + " ");
-            for (int j = 1; j <= 10; ++j)
+            for (Int32 j = 1; j <= 10; ++j)
             {
                 if ( currField[i, j] != 0 && currField[i, j].IsHit )
                 {

@@ -2,7 +2,7 @@
 
 public struct Coords
 {
-    public Coords(string s)
+    public Coords(String s)
     {
         X = s[0] - 'a' + 1;
         Y = Int32.Parse(s[1..]);
