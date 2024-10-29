@@ -23,6 +23,8 @@ public static class BattleShip
                 _field2[i, j] = 0;
             }
         }
+
+        _lastException = "";
     }
 
     public static void PlayGame()
@@ -66,14 +68,18 @@ public static class BattleShip
 
         Console.Clear();
         Console.WriteLine("Спасибо за игру!");
+
+        if ( AreAllHit(EPlayer.First) )
+            Console.WriteLine("Игрок 2 выиграл!");
+        else
+            Console.WriteLine("Игрок 1 выиграл!");
     }
 
     public static Coords ReadMove(EPlayer player)
     {
-        Console.Clear();
-        Coords? coords = null;
+        Coords coords = new Coords("a31");
 
-        while (coords is null)
+        while (coords.Y == 31)
         {
             try
             {
@@ -83,12 +89,23 @@ public static class BattleShip
                     Console.Write("Игрок 2, ");
 
                 Console.WriteLine("введите поле, которое хотите бить: ");
-                coords = ReadPoles(1)[0];
+
+                var s = Console.ReadLine();
+
+                if ( s == null || !new Regex(@"([a-j]([1-9]|10))").IsMatch(s) )
+                    throw new Exception("Неправильный формат вводимых данных!");
+
+                var split = s.Split().Where(a => a.Length > 0).ToArray();
+
+                if (split.Length != 1)
+                    throw new Exception("Неправильный формат вводимых данных!");
+
+                coords = new Coords(split[0]);
             }
             catch (Exception e) { Console.WriteLine(e); }
         }
 
-        return new Coords();
+        return coords;
     }
 
     private static EPlayer Enemy(EPlayer curr) => (curr == EPlayer.First) ? EPlayer.Second : EPlayer.First;
@@ -152,7 +169,7 @@ public static class BattleShip
 
     private static Coords[] ReadPoles(int shipLength)
     {
-        Console.Write("Введите корабль длины {0}: ", shipLength);
+        Console.Write("Введите корабль длины {0} (ввести нужно все поля, на которых будет кораблик): ", shipLength);
         var s = Console.ReadLine();
 
         if ( s == null || !new Regex(@"([a-j]([1-9]|10))").IsMatch(s) )
