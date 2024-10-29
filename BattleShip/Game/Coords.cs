@@ -10,6 +10,4 @@ public struct Coords
 
     public Int32 X { get; }
     public Int32 Y { get; }
-
-
 }

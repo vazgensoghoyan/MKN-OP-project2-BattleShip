@@ -8,6 +8,8 @@ public static class BattleShip
     private static Pole[,] _field1;
     private static Pole[,] _field2;
 
+    private static String _lastException;
+
     static BattleShip()
     {
         _field1 = new Pole[12, 12];
@@ -25,8 +27,6 @@ public static class BattleShip
 
     public static void PlayGame()
     {
-        Console.Clear();
-
         ReadShips(EPlayer.First);
         ReadShips(EPlayer.Second);
 
@@ -37,11 +37,58 @@ public static class BattleShip
             if ( AreAllHit(EPlayer.First) || AreAllHit(EPlayer.Second) )
                 break;
 
+            Console.WriteLine("Вот ваше поле: ");
+            Print(currPlayer);
+
+            var coords = ReadMove(currPlayer);
+
+            if (currPlayer == EPlayer.First)
+            {
+                if (_field2[coords.X, coords.Y].Length != 0)
+                {
+                    _field2[coords.X, coords.Y].Hit();
+                    Console.WriteLine("Есть попадание! Давайте еще");
+                    currPlayer = Enemy(currPlayer);
+                }
+            }
+            else
+            {
+                if (_field1[coords.X, coords.Y].Length != 0)
+                {
+                    _field1[coords.X, coords.Y].Hit();
+                    Console.WriteLine("Есть попадание! Давайте еще");
+                    currPlayer = Enemy(currPlayer);
+                }
+            }
+
             currPlayer = Enemy(currPlayer);
         }
 
         Console.Clear();
         Console.WriteLine("Спасибо за игру!");
+    }
+
+    public static Coords ReadMove(EPlayer player)
+    {
+        Console.Clear();
+        Coords? coords = null;
+
+        while (coords is null)
+        {
+            try
+            {
+                if (player == EPlayer.First)
+                    Console.Write("Игрок 1, ");
+                else
+                    Console.Write("Игрок 2, ");
+
+                Console.WriteLine("введите поле, которое хотите бить: ");
+                coords = ReadPoles(1)[0];
+            }
+            catch (Exception e) { Console.WriteLine(e); }
+        }
+
+        return new Coords();
     }
 
     private static EPlayer Enemy(EPlayer curr) => (curr == EPlayer.First) ? EPlayer.Second : EPlayer.First;
@@ -67,21 +114,44 @@ public static class BattleShip
             for (int j = 0; j < shipsCount; j++)
             {
                 try 
-                { 
-                    ReadShip(shipLength, player); 
+                {
+                    Print(player);
+                    _lastException = string.Empty;
+                    var coords = ReadPoles(shipLength);
+
+                    var currField = (player == EPlayer.First) ? _field1 : _field2;
+
+                    foreach (var coord in coords)
+                    {
+                        for (int ii = -1; ii <= 1; ii++)
+                        {
+                            for (int jj = -1; jj <= 1; jj++)
+                            {
+                                if (currField[coord.X + ii, coord.Y + jj] != 0)
+                                    throw new Exception("Не там поставлен кораблик!");
+                            }
+                        }
+                    }
+
+                    foreach (var coord in coords)
+                    {
+                        if (player == EPlayer.First)
+                            _field1[coord.X, coord.Y] = shipLength;
+                        else
+                            _field2[coord.X, coord.Y] = shipLength;
+                    }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    _lastException = e.Message;
                     j--;
                 }
             }
         }
     }
 
-    private static void ReadShip(int shipLength, EPlayer player)
+    private static Coords[] ReadPoles(int shipLength)
     {
-        Print();
         Console.Write("Введите корабль длины {0}: ", shipLength);
         var s = Console.ReadLine();
 
@@ -99,37 +169,21 @@ public static class BattleShip
 
         var areEq1 = true;
         var areEq2 = true;
+
+        //var a = (shipLength == 1) ? 0 : (coords[0].X <= coords[1].X ? 1 : -1);
+        //var b = (shipLength == 1) ? 0 : (coords[0].Y <= coords[1].Y ? 1 : -1);
+
         for (int i = 1; i < shipLength; i++)
-            if ( coords[i].X != coords[i-1].X )
+            if ( coords[i].X != coords[i-1].X /*&& coords[i-1].Y - coords[i].Y != b*/ )
                 areEq1 = false;
         for (int i = 1; i < shipLength; i++)
-            if ( coords[i].Y != coords[i-1].Y )
+            if ( coords[i].Y != coords[i-1].Y /*&& coords[i-1].X - coords[i].X != a*/ )
                 areEq2 = false;
 
         if ( !areEq1 && !areEq2 )
             throw new Exception("Кораблики не могут ходить по диагонали!");
 
-        var currField = (player == EPlayer.First) ? _field1 : _field2;
-        
-        foreach (var coord in coords)
-        {
-            for (int i = -1; i <= 1; i++)
-            {
-                for (int j = -1; j <= 1; j++)
-                {
-                    if (currField[coord.X + i, coord.Y + j] != 0)
-                        throw new Exception("Не там поставлен кораблик!");
-                }
-            }
-        }
-
-        foreach (var coord in coords)
-        {
-            if (player == EPlayer.First)
-                _field1[coord.X, coord.Y] = shipLength;
-            else
-                _field2[coord.X, coord.Y] = shipLength;
-        }
+        return coords;
     }
 
     private static Int32[] GetIndexes(Int32 aX, Int32 aY, Int32 bX, Int32 bY)
@@ -152,9 +206,11 @@ public static class BattleShip
         return indexes;
     }
 
-    public static void Print()
+    public static void Print(EPlayer player)
     {
-        Console.Clear();
+        var currField = (player == EPlayer.First) ? _field1 : _field2;
+
+        Console.Clear();    
         Console.WriteLine("  1 2 3 4 5 6 7 8 9 10");
         var s = "abcdefghij";
 
@@ -163,15 +219,17 @@ public static class BattleShip
             Console.Write(s[i-1] + " ");
             for (int j = 1; j <= 10; ++j)
             {
-                if (_field1[i, j] != 0)
+                if (currField[i, j] != 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write(_field1[i, j] + " ");
+                    Console.ForegroundColor = currField[i, j].IsHit ? ConsoleColor.Red : ConsoleColor.Blue;
+                    Console.Write(currField[i, j] + " ");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
-                else Console.Write(_field1[i, j] + " ");
+                else Console.Write(currField[i, j] + " ");
             }
             Console.WriteLine();
         }
+
+        Console.WriteLine(_lastException);
     }
 }

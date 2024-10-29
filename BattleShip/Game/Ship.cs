@@ -18,4 +18,6 @@ public struct Pole
     public static implicit operator Pole(Int32 number) => new Pole(number);
 
     public void Hit() => IsHit = true;
+
+    public override string ToString() => Length.ToString();
 }
