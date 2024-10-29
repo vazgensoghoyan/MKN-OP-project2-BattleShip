@@ -29,6 +29,14 @@ public static class BattleShip
 
     public static void PlayGame()
     {
+        Console.Clear();
+        Console.WriteLine("Добрый день!");
+        Console.WriteLine("Кораблики надо вводить в формате a1 a2 a3 (вводить все поля, на которых будет находиться кораблик).");
+        Console.WriteLine("Сначала данные вводит игрок 1, потом игрок 2.");
+        Console.WriteLine("Нажмите Enter, чтобы продолжить...");
+
+        while (Console.ReadKey().Key != ConsoleKey.Enter) { }
+
         ReadShips(EPlayer.First);
         ReadShips(EPlayer.Second);
 
@@ -89,7 +97,7 @@ public static class BattleShip
                 else
                     Console.Write("Игрок 2, ");
 
-                Console.WriteLine("введите поле, которое хотите бить: ");
+                Console.Write("введите поле, которое хотите бить: ");
 
                 var s = Console.ReadLine();
 
@@ -170,7 +178,7 @@ public static class BattleShip
 
     private static Coords[] ReadPoles(int shipLength)
     {
-        Console.Write("Введите корабль длины {0} (ввести нужно все поля, на которых будет кораблик): ", shipLength);
+        Console.Write("Введите корабль длины {0}: ", shipLength);
         var s = Console.ReadLine();
 
         if ( s == null || !new Regex(@"([a-j]([1-9]|10))").IsMatch(s) )
@@ -283,7 +291,7 @@ public static class BattleShip
                 if ( currField[i, j] != 0 && currField[i, j].IsHit )
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write(currField[i, j] + " ");
+                    Console.Write("1 ");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
                 else Console.Write("0 ");
