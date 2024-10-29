@@ -41,6 +41,7 @@ public static class BattleShip
 
             Console.WriteLine("Вот ваше поле: ");
             Print(currPlayer);
+            PrintForEnemy(currPlayer);
 
             var coords = ReadMove(currPlayer);
 
@@ -243,6 +244,33 @@ public static class BattleShip
                     Console.ForegroundColor = ConsoleColor.White;
                 }
                 else Console.Write(currField[i, j] + " ");
+            }
+            Console.WriteLine();
+        }
+
+        Console.WriteLine(_lastException);
+    }
+
+
+    public static void PrintForEnemy(EPlayer player)
+    {
+        var currField = (player == EPlayer.First) ? _field2 : _field1;
+
+        Console.WriteLine("  1 2 3 4 5 6 7 8 9 10");
+        var s = "abcdefghij";
+
+        for (int i = 1; i <= 10; ++i)
+        {
+            Console.Write(s[i - 1] + " ");
+            for (int j = 1; j <= 10; ++j)
+            {
+                if ( currField[i, j] != 0 && currField[i, j].IsHit )
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(currField[i, j] + " ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else Console.Write("0 ");
             }
             Console.WriteLine();
         }
